@@ -1,25 +1,60 @@
-import logo from './logo.svg';
+// App.js - Main Application Component using separate files
+import React, { useState, useEffect } from 'react';
+import Login from './components/Login';
+import UsersList from './components/Users/UserList';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check authentication on app load
+    const checkAuth = () => {
+      const token = localStorage.getItem('authToken');
+      console.log('Token on app load:', token);
+      
+      setIsAuthenticated(!!token);
+      setIsLoading(false);
+    };
+
+    // Small delay to show loading state
+    setTimeout(checkAuth, 500);
+  }, []);
+
+  const handleLogin = (token) => {
+    console.log('Login successful in App component:', token);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    console.log('Logout triggered in App component');
+    setIsAuthenticated(false);
+  };
+
+  // Loading screen
+  if (isLoading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <h2>User Management System</h2>
+          <p>Loading application...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Login or UsersList based on authentication
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {isAuthenticated ? (
+        <UsersList onLogout={handleLogout} />
+      ) : (
+        <Login onLogin={handleLogin} />
+      )}
     </div>
   );
-}
+};
 
 export default App;
